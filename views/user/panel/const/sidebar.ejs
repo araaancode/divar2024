@@ -1,0 +1,21 @@
+<div class="layout-sidebar">
+  <div class="layout-sidebar-backdrop"></div>
+  <div class="layout-sidebar-body">
+    <div class="custom-scrollbar">
+      <nav id="sidenav" class="sidenav-collapse collapse">
+        <ul class="sidenav level-1">
+          <li class="sidenav-heading">منو کاربری</li>
+          <% sideBar.forEach(element => { %>
+          <li class="sidenav-item <%=(element.url==active)?'active':''%>">
+            <a href="<%=element.url%>">
+              <span class="sidenav-badge badge badge-primary"><%=element.count%></span>
+              <span class="sidenav-icon icon <%=element.icon%>"></span>
+              <span class="sidenav-label"><%=element.name%></span>
+            </a>
+          </li>
+          <% }) %>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

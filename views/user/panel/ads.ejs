@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<%-include('const/head')  %>
+
+<body class="layout layout-header-fixed">
+    <%-include('const/header')  %>
+    <div class="layout-main">
+        <%-include('const/sidebar')  %>
+        <div class="layout-content">
+            <div class="layout-content-body">
+                <div class="row gutter-xs">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-actions">
+                                <button type="button" class="card-action card-toggler" title="Collapse"></button>
+                            </div>
+                            <strong>Ads List</strong>
+                        </div>
+                        <div class="card-body">
+                            <table id="adsTable" data-language="<%=JSON.stringify(dataTableLanguage)%>"
+                                class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>عنوان</th>
+                                        <th>قیمت</th>
+                                        <th>ویرایش</th>
+                                        <th>حذف</th>
+                                        <th>وضعیت</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% list.forEach( (element,index) => { %>
+                                    <tr>
+                                        <td><%=index+1%></td>
+                                        <td><%=element.title%></td>
+                                        <td><%=element.price%></td>
+                                        <td><button onclick="openModalAds('<%=element._id%>')"
+                                                class="btn btn-primary btn-xs" type="button">ویرایش</button>
+                                        </td>
+                                        <td><button onclick="deleteAds('<%=element._id%>')"
+                                                class="btn btn-danger btn-xs" type="button">حذف</button>
+                                        </td>
+                                        <td>
+                                            <% if (element.isActive) { %>
+                                            فعال
+                                            <% }else{%>
+                                            غیر فعال (<%=element.deActiveText%>)
+                                            <%} %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <%-include('const/footer')  %>
+    </div>
+    <div id="editAdsModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <div class="text-center">
+                        <span class="icon icon-laptop icon-5x m-y-lg"></span>
+                        <h4 class="modal-title">عنوان آگهی</h4>
+                    </div>
+                </div>
+                <div class="modal-tabs">
+                    <ul id="editAdsModalTabs" class="nav nav-tabs nav-justified">
+                        <li class="active"><a href="#info" data-toggle="tab">اطلاعات متنی</a></li>
+                        <li id="mapTab"><a href="#map" data-toggle="tab">نقشه</a></li>
+                        <li><a href="#primePhoto" data-toggle="tab">عکس اصلی</a></li>
+                        <li><a href="#photos" data-toggle="tab">عکس ها</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade active in" id="info">
+                            <form action="#">
+                                <div class="form-group">
+                                    <label>عنوان</label>
+                                    <input id="info-title" type="text" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>توضیحات</label>
+                                    <textarea id="info-description" rows="3" class="form-control">
+
+                                    </textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>قیمت</label>
+                                    <input id="info-price" type="text" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>آدرس</label>
+                                    <input id="info-address" type="text" class="form-control">
+                                </div>
+                                <button id="editJustInfoSubmit" type="button"
+                                    class="btn btn-primary btn-block">ویرایش</button>
+
+                            </form>
+                        </div>
+                        <div class=" tab-pane fade" id="map">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="mapIran" style="height: 250px;">
+
+                                    </div>
+
+                                </div>
+                                <div class="col-md-12">
+                                    <button id="editMapSubmit" type="button"
+                                        class="btn btn-primary btn-block">ویرایش</button>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="primePhoto">
+                            <div class="col-md-12">
+                                <div class="panel panel-body text-center" data-toggle="match-height">
+                                    <h5>عکس شاخص آگهی شما</h5>
+                                    <div class="icon-with-child">
+                                        <img id="primePhotoSrc" class="circle" width="64" height="64">
+                                    </div>
+                                    <label class="btn btn-primary btn-block file-upload-btn">
+                                        Upload File
+                                        <input id="primePhotoUpload" class="file-upload-input" type="file">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="photos">
+                            <label class="btn btn-primary btn-block file-upload-btn ">
+                                Upload File
+                                <input id="photosUpload" class="file-upload-input" type="file">
+                            </label>
+                            <div id="photosList" class="list-group">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%-include('const/script')  %>
+    <script>
+        var map;
+        var marker;
+
+        $(document).ready(function () {
+            map = new L.Map('mapIran', {
+                key: 'web.qS0Z33cfeXEvaExVOOyDwufAsXRCUtulmukpyxFM',
+                maptype: 'dreamy',
+                poi: true,
+                traffic: false,
+                center: [32.661343, 51.680374],
+                zoom: 14
+            });
+
+            map.on('move', function (e) {
+                map.invalidateSize();
+                marker.setLatLng(map.getCenter())
+            });
+            $('#adsTable').DataTable({
+                responsive: true
+            });
+            $('#editAdsModal').on('shown.bs.modal', function () {
+                $('#editAdsModalTabs a[href="#info"]').tab('show')
+            })
+            $('#editAdsModalTabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                if ($(e.target).attr("href") == "#map") {
+                    setTimeout(function () {
+                        map.invalidateSize();
+                    }, 500)
+                }
+            });
+            $('#editMapSubmit').click(function (e) {
+                $.ajax({
+                    type: "PUT",
+                    url: `/api/users/ads/${$('#editJustInfoSubmit').data('adsid')}/map`,
+                    data: {
+                        lat: marker._latlng.lat,
+                        lng: marker._latlng.lng,
+                    },
+                    success: function (response) {
+                        Swal.fire(
+                            'updated!',
+                            'success'
+                        ).then((re) => {
+                            if (re.value) {
+
+                            }
+                        })
+                    }
+                });
+            });
+            $('#editJustInfoSubmit').click(function (e) {
+                $.ajax({
+                    type: "PUT",
+                    url: `/api/users/ads/${$('#editJustInfoSubmit').data('adsid')}`,
+                    data: {
+                        title: $('#info-title').val(),
+                        description: $('#info-description').val(),
+                        price: $('#info-price').val(),
+                        address: $('#info-address').val(),
+                    },
+                    success: function (response) {
+                        Swal.fire(
+                            'updated!',
+                            'success'
+                        ).then((re) => {
+                            if (re.value) {
+
+                            }
+                        })
+                    }
+                });
+            });
+            $('#primePhotoUpload').change(function (e) {
+                var fd = new FormData();
+                fd.set('primePhoto', $('#primePhotoUpload')[0].files[0])
+                $.ajax({
+                    type: "PUT",
+                    url: `/api/users/ads/${$('#editJustInfoSubmit').data('adsid')}/primePhoto`,
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        Swal.fire(
+                            'updated!',
+                            'Your file has been updated',
+                            'success'
+                        ).then((re) => {
+                            if (re.value) {
+                                openModalAds($('#editJustInfoSubmit').data('adsid'))
+                            }
+                        })
+                    }
+                });
+            });
+            $('#photosUpload').change(function (e) {
+                var fd = new FormData();
+                fd.set('photos', $('#photosUpload')[0].files[0])
+                $.ajax({
+                    type: "PUT",
+                    url: `/api/users/ads/${$('#editJustInfoSubmit').data('adsid')}/photos`,
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        Swal.fire(
+                            'updated!',
+                            'Your file has been updated',
+                            'success'
+                        ).then((re) => {
+                            if (re.value) {
+                                openModalAds($('#editJustInfoSubmit').data('adsid'))
+                            }
+                        })
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        function deleteAds(adsId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        type: "DELETE",
+                        url: `/api/users/ads/${adsId}`,
+                        success: function (response) {
+                            Swal.fire(
+                                'updated!',
+                                'Your file has been updated',
+                                'success'
+                            ).then((re) => {
+                                if (re.value) {
+
+                                }
+                            })
+                        }
+                    });
+
+                }
+            })
+        }
+
+        function deletePhotos(photosId) {
+            $.ajax({
+                type: "DELETE",
+                url: `/api/users/ads/${$('#editJustInfoSubmit').data('adsid')}/photos/${photosId}`,
+                success: function (response) {
+                    Swal.fire(
+                        'updated!',
+                        'Your file has been updated',
+                        'success'
+                    ).then((re) => {
+                        if (re.value) {
+                            openModalAds($('#editJustInfoSubmit').data('adsid'))
+                        }
+                    })
+                }
+            });
+        }
+
+        function openModalAds(adsId) {
+            $.ajax({
+                type: "GET",
+                url: `/api/users/ads/${adsId}`,
+                success: function (response) {
+                    console.log(response);
+                    $('#info-title').val(response.title);
+                    $('#info-description').val(response.description);
+                    $('#info-price').val(response.price);
+                    $('#info-address').val(response.address);
+                    $('#editJustInfoSubmit').data('adsid', adsId);
+                    marker = L.marker([response.lat, response.lng]).addTo(map);
+                    map.panTo(new L.LatLng(response.lat, response.lng));
+                    $('#primePhotoSrc').attr('src', `/ads/${response.primePhoto}`);
+                    $('#photosList').html('');
+                    response.photos.forEach(element => {
+                        $('#photosList').append(`<a class="list-group-item" href="#">
+                                    <div class="media">
+                                        <div class="media-left">
+                                            <img class="circle" width="40" height="40" src="/ads/${element.filename}">
+                                        </div>
+                                        <div class="media-middle media-right">
+                                            <button onclick="deletePhotos('${element._id}')" class="btn btn-danger" type="button">حذف</button>
+                                        </div>
+                                    </div>
+                                </a>`);
+                    });
+                    $('#editAdsModal').modal('show');
+                }
+            });
+
+        }
+    </script>
+</body>
+
+</html>

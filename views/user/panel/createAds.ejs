@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<%-include('const/head')  %>
+
+<body class="layout layout-header-fixed">
+    <%-include('const/header')  %>
+    <div class="layout-main">
+        <%-include('const/sidebar')  %>
+        <div class="layout-content">
+            <div class="layout-content-body">
+                <div class="row gutter-xs">
+                    <div class="col-md-12">
+                        <div class="panel panel-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="demo-form-wrapper">
+                                        <form action="javascript:void(0)" autocomplete="off" class="form">
+                                            <div class="form-group">
+                                                <label>عنوان</label>
+                                                <input id="title" autocomplete="off" class="form-control" type="text">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>قیمت</label>
+                                                <input id="price" autocomplete="off" class="form-control" type="text">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>توضیحات</label>
+                                                <textarea id="description" autocomplete="off"
+                                                    class="form-control"></textarea>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="demo-form-wrapper">
+                                        <form action="javascript:void(0)" autocomplete="off" class="form">
+
+                                            <div class="form-group">
+                                                <label>عکس شاخص</label>
+                                                <div class="input-group">
+                                                    <input readonly id="primePhotoText" class="form-control" type="text"
+                                                        value="لطفا عکس خود را انتخاب کنید">
+                                                    <span class="input-group-btn">
+                                                        <label class="btn btn-primary file-upload-btn">
+                                                            <input id="primePhoto" class="file-upload-input" type="file"
+                                                                name="file" accept="image/*">
+                                                            <span class="icon icon-paperclip icon-lg"></span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>عکس ها</label>
+                                                <div class="input-group">
+                                                    <input id="photosText" readonly class="form-control" type="text"
+                                                        value="لطفا عکس خود را انتخاب کنید">
+                                                    <span class="input-group-btn">
+                                                        <label class="btn btn-primary file-upload-btn">
+                                                            <input id="photos" class="file-upload-input" type="file"
+                                                                name="file" multiple accept="image/*">
+                                                            <span class="icon icon-paperclip icon-lg"></span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>آدرس</label>
+                                                <input id="address" autocomplete="off" class="form-control" type="text">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>نقشه</label>
+                                                <div id="map" style="height: 250px;">
+
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <button id="addAds" class="btn btn-primary btn-block" type="button">ثبت
+                                            آگهی</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%-include('const/footer')  %>
+    </div>
+    <%-include('const/script')  %>
+    <script>
+        var map;
+        var marker;
+        $(document).ready(function () {
+            map = new L.Map('map', {
+                key: 'web.qS0Z33cfeXEvaExVOOyDwufAsXRCUtulmukpyxFM',
+                maptype: 'dreamy',
+                poi: true,
+                traffic: false,
+                center: [32.661343, 51.680374],
+                zoom: 14
+            });
+            marker = L.marker([32.661343, 51.680374]).addTo(map);
+            map.on('move', function (e) {
+                marker.setLatLng(map.getCenter())
+            });
+            $('#primePhoto').change(function (e) {
+                $('#primePhotoText').val('عکس شما انتخاب شد');
+            });
+            $('#photos').change(function (e) {
+                $('#photosText').val(`${Array.from($('#photos')[0].files).length} عدد عکس انتخاب شد`);
+            });
+            $('#addAds').click(function (e) {
+                var fd = new FormData();
+                Array.from($('#photos')[0].files).forEach(file => {
+                    fd.append('photos', file);
+                });
+
+                fd.set('title', $('#title').val())
+                fd.set('description', $('#description').val())
+                fd.set('price', $('#price').val())
+                fd.set('primePhoto', $('#primePhoto')[0].files[0])
+                fd.set('address', $('#address').val())
+                fd.set('lat', marker._latlng.lat)
+                fd.set('lng', marker._latlng.lng)
+                $.ajax({
+                    type: "POST",
+                    url: "/api/users/ads",
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'آگهی شما ایجاد شد',
+                            confirmButtonText: 'تایید'
+                        }).then((result) => {
+                            if (result.value) {
+                                location.reload();
+                            }
+                        })
+                    }
+                });
+
+            });
+        });
+    </script>
+</body>
+
+</html>

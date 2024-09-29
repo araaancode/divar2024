@@ -1,0 +1,91 @@
+<script src="/theme/js/vendor.min.js"></script>
+<script src="/theme/js/elephant.min.js"></script>
+<script src="/theme/js/application.min.js"></script>
+<script src="/theme/js/demo.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $("#preAuthSubmit").click(function (e) {
+      $.ajax({
+        type: "POST",
+        url: "/api/users/auth",
+        data: {
+          phone: $("#phone").val(),
+        },
+        success: function (response) {
+          $("#preAuth").hide();
+          if (response.preAuth) {
+            $("#login").show();
+          } else {
+            $("#verify").show();
+          }
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          console.log(xhr);
+          console.log(textStatus);
+          console.log(errorThrown);
+          toastr["error"](xhr.responseJSON.msg);
+        },
+      });
+    });
+    $("#loginSubmit").click(function (e) {
+      $.ajax({
+        type: "POST",
+        url: "/api/users/auth/login",
+        data: {
+          phone: $("#phone").val(),
+          password: $("#loginPassword").val(),
+        },
+        success: function (response) {
+          location.reload();
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          console.log(xhr);
+          console.log(textStatus);
+          console.log(errorThrown);
+          toastr["error"](xhr.responseJSON.msg);
+        },
+      });
+    });
+    $("#verifySubmit").click(function (e) {
+      $.ajax({
+        type: "POST",
+        url: "/api/users/auth/verify",
+        data: {
+          phone: $("#phone").val(),
+          code: $("#code").val(),
+        },
+        success: function (response) {
+          $("#verify").hide();
+          $("#setPassword").show();
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          console.log(xhr);
+          console.log(textStatus);
+          console.log(errorThrown);
+          toastr["error"](xhr.responseJSON.msg);
+        },
+      });
+    });
+    $("#setPasswordSubmit").click(function (e) {
+      $.ajax({
+        type: "POST",
+        url: "/api/users/auth/setPassword",
+        data: {
+          phone: $("#phone").val(),
+          fname: $("#fname").val(),
+          lname: $("#lname").val(),
+          password: $("#password").val(),
+        },
+        success: function (response) {
+          location.reload();
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          console.log(xhr);
+          console.log(textStatus);
+          console.log(errorThrown);
+          toastr["error"](xhr.responseJSON.msg);
+        },
+      });
+    });
+  });
+</script>

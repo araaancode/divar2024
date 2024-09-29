@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<%-include('const/head')  %>
+
+<body class="layout layout-header-fixed">
+    <%-include('const/header')  %>
+    <div class="layout-main">
+        <%-include('const/sidebar')  %>
+        <div class="layout-content">
+            <div class="layout-content-body">
+                <div class="row gutter-xs">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-actions">
+                                <button data-toggle="modal" data-target="#modalAddAdmin" class="btn btn-primary btn-xs"
+                                    type="button">Add</button>
+                            </div>
+                            <strong>Admins List</strong>
+                        </div>
+                        <div class="card-body">
+                            <table id="adminsTable" data-language="<%=JSON.stringify(dataTableLanguage)%>"
+                                class="table table-striped table-nowrap dataTable" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>نام کاربری</th>
+                                        <th>دسترسی ها</th>
+                                        <th>نوع دسترسی</th>
+                                        <th>وضعیت</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% list.forEach( (element,index) => { %>
+                                    <tr style="cursor: pointer;"
+                                        onclick="openModal('<%=element._id%>','<%=element.username%>','<%=element.access%>','<%=element.accessType%>','<%=element.isActive%>')">
+                                        <td><%=index+1%></td>
+                                        <td><%=element.username%></td>
+                                        <td><%=element.access%></td>
+                                        <td>
+                                            <% if (element.accessType=='administrator') { %>
+                                            ادمین
+                                            <% }else{%>
+                                            فقط خواندنی
+                                            <%} %>
+                                        </td>
+                                        <td>
+                                            <% if (element.isActive) { %>
+                                            فعال
+                                            <% }else{%>
+                                            غیر فعال
+                                            <%} %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%-include('const/footer')  %>
+        <div id="modalAddAdmin" tabindex="-1" role="dialog" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <h4 class="modal-title">Add Admin</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form action="javascript:void(0)" autocomplete="off">
+                            <div class="form-group">
+                                <label class="control-label">UserName</label>
+                                <input class="form-control" type="text" id="username">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Password</label>
+                                <input class="form-control" type="text" id="password">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Access</label>
+                                <select class="form-control" id="accessSelect">
+                                    <% accessList.forEach(element => { %>
+                                    <option value="<%=element.slug%>"><%=element.name%></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Access Type</label>
+                                <select class="form-control" id="accessTypeSelect">
+                                    <% accessTypeList.forEach(element => { %>
+                                    <option value="<%=element.slug%>"><%=element.name%></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <button id="addAdmin" class="btn btn-primary btn-block btn-next" type="button">Create an
+                                account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="modalEditAdmin" tabindex="-1" role="dialog" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <h4 class="modal-title">Edit Admin</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form action="javascript:void(0)" autocomplete="off">
+                            <div class="form-group">
+                                <label class="control-label">UserName</label>
+                                <input class="form-control" type="text" id="usernameEdit">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Password</label>
+                                <input class="form-control" type="text" id="passwordEdit">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Access</label>
+                                <select class="form-control" id="accessSelectEdit">
+                                    <% accessList.forEach(element => { %>
+                                    <option value="<%=element.slug%>"><%=element.name%></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Access Type</label>
+                                <select class="form-control" id="accessTypeSelectEdit">
+                                    <% accessTypeList.forEach(element => { %>
+                                    <option value="<%=element.slug%>"><%=element.name%></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">is Active</label>
+                                <select class="form-control" id="isActiveSelectEdit">
+                                    <option value="true">فعال</option>
+                                    <option value="false">غیر فعال</option>
+                                </select>
+                            </div>
+                            <button id="editAdmin" class="btn btn-primary btn-block btn-next" type="button">Edit an
+                                account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%-include('const/script')  %>
+    <script>
+        function openModal(adminId, username, access, accessType, isActive) {
+            $('#usernameEdit').val(username);
+            $('#accessSelectEdit').val(access.split(','));
+            $('#accessSelectEdit').trigger('change');
+            $('#accessTypeSelectEdit').val(accessType);
+            $('#isActiveSelectEdit').val(isActive);
+            $('#modalEditAdmin').modal('show');
+        }
+        $(document).ready(function () {
+
+            $('#addAdmin').click(function (e) {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/panel/admins",
+                    data: {
+                        username: $('#username').val(),
+                        password: $('#password').val(),
+                        access: $('#accessSelect').val(),
+                        accessType: $('#accessTypeSelect').val(),
+                    },
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ادمین ایجاد شد',
+                            confirmButtonText: 'تایید'
+                        }).then((result) => {
+                            if (result.value) {
+                                location.reload();
+                            }
+                        })
+                    },
+                    error: function (jqXHR, status, err) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: jqXHR.responseJSON.msg,
+                            confirmButtonText: 'تایید'
+                        }).then((result) => {
+
+                        })
+                    }
+                });
+            });
+
+            $('#accessSelect').select2({
+                multiple: true
+            })
+            $('#accessSelectEdit').select2({
+                multiple: true
+            })
+            $('#adminsTable').DataTable({
+                responsive: true
+            });
+        });
+    </script>
+</body>
+
+</html>
